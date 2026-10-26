@@ -405,7 +405,7 @@ function initEmailCopy() {
   if (!btn || !toast) return;
 
   btn.addEventListener('click', async () => {
-    const email = btn.getAttribute('data-email') || 'hello@portfolio.site';
+    const email = btn.getAttribute('data-email') || 'cheedyou5@gmail.com';
 
     try {
       if (navigator.clipboard && window.isSecureContext) {
