@@ -10,6 +10,7 @@ document.addEventListener('DOMContentLoaded', () => {
   initPreviewSystem();
   initViewNavigator();
   initBouncyTypography();
+  initNumberBounce();
   initDigitalClock();
   initEmailCopy();
 });
@@ -147,6 +148,13 @@ const PREVIEW_DATA = {
   }
 };
 
+// Keep the existing detail destinations; preview panels display images only.
+Object.entries(PREVIEW_DATA).forEach(([key, data]) => {
+  data.html = key === 'preview-letter-project'
+    ? '<img src="assets/walla-preview.png" alt="왈라 최종 개선 화면">'
+    : '';
+});
+
 let currentTargetViewId = 'view-script-maker';
 
 function initPreviewSystem() {
@@ -169,9 +177,9 @@ function initPreviewSystem() {
     previewBody.classList.remove('preview-fade-in');
     void previewBody.offsetWidth; // Trigger reflow
 
-    previewCat.textContent = data.category;
-    previewUrl.textContent = data.url;
-    previewSubtitle.textContent = data.subtitle;
+    if (previewCat) previewCat.textContent = data.category;
+    if (previewUrl) previewUrl.textContent = data.url;
+    if (previewSubtitle) previewSubtitle.textContent = data.subtitle;
     previewBody.innerHTML = data.html;
 
     previewBody.classList.add('preview-fade-in');
@@ -193,6 +201,13 @@ function initPreviewSystem() {
   previewCard.addEventListener('click', () => {
     if (window.navigateToView) {
       window.navigateToView(currentTargetViewId);
+    }
+  });
+
+  previewCard.addEventListener('keydown', (event) => {
+    if (event.key === 'Enter' || event.key === ' ') {
+      event.preventDefault();
+      previewCard.click();
     }
   });
 
@@ -348,7 +363,7 @@ function triggerWaveBounce(bouncyElement) {
   chars.forEach((char, i) => {
     setTimeout(() => {
       triggerSingleBounce(char);
-    }, i * 30);
+    }, i * 55);
   });
 }
 
@@ -423,4 +438,17 @@ function initEmailCopy() {
       toast.classList.add('translate-y-20', 'opacity-0', 'pointer-events-none');
     }, 2500);
   }
+}
+
+// Only menu numbers bounce; sentence titles remain still.
+function initNumberBounce() {
+  document.querySelectorAll('.striped-row').forEach(row => {
+    const number = row.querySelector('.row-num');
+    if (!number) return;
+    const bounce = () => {
+      if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) triggerSingleBounce(number);
+    };
+    row.addEventListener('mouseenter', bounce);
+    row.addEventListener('focus', bounce);
+  });
 }
